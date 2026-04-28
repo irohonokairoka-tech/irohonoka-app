@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>今のわたしを知る、香り診断</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#8b2c3b">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="香り診断">
+  <link rel="icon" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <style>
+    :root{
+      --ink:#4b4038;
+      --sub:#7a6b61;
+      --line:#e8dcd0;
+      --paper:rgba(255,255,255,.78);
+      --gold:#b99a5b;
+      --rose:#f7dfe2;
+      --cream:#fff8ed;
+      --green:#e8f1e7;
+      --shadow:0 18px 45px rgba(85,61,43,.12);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: "Hiragino Mincho ProN","Yu Mincho","YuMincho","Noto Serif JP",serif;
+      color:var(--ink);
+      background:
+        radial-gradient(circle at 12% 8%, rgba(255,230,220,.9), transparent 28%),
+        radial-gradient(circle at 88% 15%, rgba(255,244,204,.9), transparent 28%),
+        linear-gradient(135deg,#fffaf3,#fff1f3,#f8f4ec);
+      min-height:100vh;
+      padding:18px;
+    }
+    .wrap{max-width:1080px;margin:0 auto}
+    .hero{
+      position:relative;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.8);
+      border-radius:28px;
+      background:rgba(255,255,255,.62);
+      box-shadow:var(--shadow);
+      padding:34px 22px;
+      text-align:center;
+      backdrop-filter: blur(8px);
+    }
+    .hero:before{
+      content:"";
+      position:absolute; inset:16px;
+      border:1px solid rgba(185,154,91,.25);
+      border-radius:22px;
+      pointer-events:none;
+    }
+    .brand{
+      display:inline-block;
+      letter-spacing:.22em;
+      font-size:12px;
+      color:var(--gold);
+      border:1px solid rgba(185,154,91,.35);
+      border-radius:999px;
+      padding:8px 14px;
+      background:rgba(255,255,255,.65);
+      margin-bottom:14px;
+    }
+    h1{font-size:clamp(28px,6vw,48px);line-height:1.25;margin:0;font-weight:600}
+    .lead{max-width:680px;margin:14px auto 0;line-height:1.9;color:var(--sub);font-size:15px}
+    .grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:18px;margin-top:18px}
+    .card{
+      border:1px solid rgba(255,255,255,.82);
+      border-radius:26px;
+      background:var(--paper);
+      box-shadow:var(--shadow);
+      padding:20px;
+      backdrop-filter: blur(8px);
+    }
+    .title{font-size:20px;font-weight:700;margin:0 0 16px;display:flex;gap:8px;align-items:center}
+    label{display:block;font-size:14px;font-weight:700;margin:14px 0 8px}
+    input{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:white;
+      padding:14px 15px;
+      font-size:16px;
+      color:var(--ink);
+      outline:none;
+    }
+    input:focus{border-color:var(--gold);box-shadow:0 0 0 4px rgba(185,154,91,.12)}
+    .note{font-size:12px;color:var(--sub);line-height:1.8;margin-top:8px}
+    .mini{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}
+    .miniBox{
+      text-align:center;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.7);
+      border-radius:18px;
+      padding:12px 8px;
+    }
+    .miniBox span{display:block;font-size:11px;letter-spacing:.14em;color:var(--sub)}
+    .miniBox strong{display:block;font-size:31px;margin-top:3px}
+    button{
+      width:100%;
+      margin-top:16px;
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:#fff;
+      color:var(--ink);
+      padding:13px;
+      font-size:15px;
+      cursor:pointer;
+    }
+    .main{
+      background:linear-gradient(135deg,var(--cream),var(--rose));
+      transition:.25s;
+    }
+    .mainLabel{font-size:12px;letter-spacing:.22em;color:var(--gold)}
+    .mainRow{display:flex;align-items:flex-end;gap:16px;margin-top:18px}
+    .mainNum{font-size:82px;line-height:.86;font-weight:700}
+    .mainName{font-size:24px;font-weight:700}
+    .mainWords{font-size:14px;color:var(--sub);margin-top:5px}
+    .msg{line-height:2;color:var(--sub);font-size:15px;margin-top:18px}
+    .aroma{
+      margin-top:16px;
+      background:rgba(255,255,255,.66);
+      border-radius:18px;
+      padding:14px;
+      font-size:14px;
+      line-height:1.8;
+    }
+    .results{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+    .result{
+      border:1px solid rgba(255,255,255,.8);
+      border-radius:22px;
+      background:rgba(255,255,255,.7);
+      padding:16px;
+      box-shadow:0 8px 22px rgba(85,61,43,.08);
+      min-height:230px;
+    }
+    .resultTop{display:flex;justify-content:space-between;gap:10px}
+    .resultTitle{font-size:11px;letter-spacing:.16em;color:var(--gold);font-weight:700}
+    .resultLabel{font-size:12px;color:var(--sub);margin-top:4px}
+    .total{font-size:11px;color:var(--sub);background:#fff;border-radius:999px;padding:4px 8px;height:fit-content}
+    .numline{display:flex;align-items:flex-end;gap:10px;margin-top:18px}
+    .num{font-size:56px;line-height:.9;font-weight:700}
+    .name{font-weight:700;font-size:15px;padding-bottom:3px}
+    .words{font-size:13px;color:var(--ink);margin-top:12px;font-weight:700}
+    .smallmsg{font-size:13px;color:var(--sub);line-height:1.8;margin-top:8px}
+    .smallAroma{font-size:12px;line-height:1.7;margin-top:10px;background:rgba(255,255,255,.62);border-radius:14px;padding:10px;color:var(--sub)}
+    .footer{
+      margin-top:18px;
+      border-radius:22px;
+      background:rgba(255,255,255,.65);
+      border:1px solid rgba(255,255,255,.8);
+      padding:18px;
+      line-height:1.9;
+      color:var(--sub);
+      font-size:13px;
+    }
+    .footer strong{color:var(--ink)}
+    @media(max-width:860px){
+      body{padding:12px}
+      .grid,.results{grid-template-columns:1fr}
+      .hero{padding:30px 16px}
+      .mainNum{font-size:76px}
+      .mini{gap:8px}
+      .card{padding:17px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="brand">IROHONOKA AROMA COLOR</div>
+      <h1>今のわたしを知る、<br>香り診断</h1>
+      <p class="lead">生年月日と名前から、今のあなたに合う数字と香りを導きます。体験された方だけにお渡しする、いろほのかの香り診断アプリです。</p>
+    </section>
+
+    <section class="grid">
+      <div class="card">
+        <h2 class="title">✦ 入力するとすぐ表示</h2>
+        <label for="birth">生年月日</label>
+        <input id="birth" type="date" />
+        <label for="name">名前 ローマ字</label>
+        <input id="name" type="text" placeholder="例 MIEKO YAMADA" />
+        <div class="note">日本語名はローマ字で入力。普段使う表記にそろえると、セッションで説明しやすくなります。</div>
+
+        <div class="mini">
+          <div class="miniBox"><span>本質</span><strong id="miniLife">—</strong></div>
+          <div class="miniBox"><span>使命</span><strong id="miniDestiny">—</strong></div>
+          <div class="miniBox"><span>今年</span><strong id="miniYear">—</strong></div>
+        </div>
+        <button onclick="resetAll()">リセット</button>
+      </div>
+
+      <div class="card main" id="mainCard">
+        <div class="mainLabel">MAIN MESSAGE</div>
+        <div class="mainRow">
+          <div class="mainNum" id="mainNum">—</div>
+          <div>
+            <div class="mainName" id="mainName">入力してください</div>
+            <div class="mainWords" id="mainWords">数字がすぐ出ます</div>
+          </div>
+        </div>
+        <div class="msg" id="mainMsg">生年月日を入れると本質の数字が、名前を入れると使命・本音・印象の数字が表示されます。</div>
+        <div class="aroma" id="mainAroma" style="display:none;"></div>
+      </div>
+    </section>
+
+    <section class="results">
+      <div class="result" id="lifeBox"></div>
+      <div class="result" id="birthBox"></div>
+      <div class="result" id="yearBox"></div>
+      <div class="result" id="destinyBox"></div>
+      <div class="result" id="soulBox"></div>
+      <div class="result" id="personalityBox"></div>
+    </section>
+
+    <section class="footer">
+      <strong>接客での使い方：</strong><br>
+      マルシェでは、まず生年月日を入力して「本質」と「今年の流れ」を出します。そのあと気になる香りを選んでもらい、数字の香りと重ねると、いろほのからしいお守りフレグランスの導線になります。<br>
+      <br>
+      <strong>計算ルール：</strong>ピタゴラス式。11・22・33はマスターナンバーとして残します。名前はローマ字入力です。
+    </section>
+  </div>
+
+<script>
+const PY = {A:1,J:1,S:1,B:2,K:2,T:2,C:3,L:3,U:3,D:4,M:4,V:4,E:5,N:5,W:5,F:6,O:6,X:6,G:7,P:7,Y:7,H:8,Q:8,Z:8,I:9,R:9};
+const VOWELS = new Set(["A","E","I","O","U"]);
+const MASTER = new Set([11,22,33]);
+
+const guide = {
+  1:{name:"はじまり",words:"自分で決める・動き出す",aroma:"オレンジ／レモン／ローズマリー",msg:"小さな一歩が、次の流れを開きます。",bg:["#fff3ed","#ffe1d6"]},
+  2:{name:"やわらぎ",words:"調和・受けとめる・つなぐ",aroma:"ラベンダー／ゼラニウム／カモミール",msg:"急がず、心地よい距離感を整える時です。",bg:["#fff0f3","#f8dfe7"]},
+  3:{name:"はなやぎ",words:"表現・喜び・創造",aroma:"グレープフルーツ／ベルガモット／イランイラン",msg:"感じたことを軽やかに出すほど魅力が伝わります。",bg:["#fff8dd","#ffe9a8"]},
+  4:{name:"ととのえ",words:"土台・安心・継続",aroma:"シダーウッド／ヒノキ／フランキンセンス",msg:"仕組みを整えることで、心も現実も安定します。",bg:["#f7f4ee","#e5f0e2"]},
+  5:{name:"風ひらく",words:"変化・自由・行動",aroma:"ペパーミント／ライム／ユーカリ",msg:"余白をつくると、新しい風が入ってきます。",bg:["#edf8ff","#d9f1f3"]},
+  6:{name:"ぬくもり",words:"愛情・育む・美しさ",aroma:"ローズ／ゼラニウム／マンダリン",msg:"大切な人を想うように、自分にもやさしさを。",bg:["#fff0f2","#ffdfe8"]},
+  7:{name:"しずく",words:"探求・内省・専門性",aroma:"ラベンダー／サンダルウッド／フランキンセンス",msg:"ひとり時間が、次の答えを澄ませてくれます。",bg:["#f0f1ff","#e8e5f2"]},
+  8:{name:"みのり",words:"成果・循環・豊かさ",aroma:"オレンジ／ジンジャー／パチュリ",msg:"価値を遠慮なく届けることで、巡りが生まれます。",bg:["#fff8df","#efe8d7"]},
+  9:{name:"余白",words:"完了・手放し・包容",aroma:"ベルガモット／クラリセージ／ラベンダー",msg:"抱えすぎたものをほどくと、新しい場所が空きます。",bg:["#f5efff","#ffe7ed"]},
+  11:{name:"ひらめき",words:"直感・感受性・導き",aroma:"ネロリ／ベルガモット／フランキンセンス",msg:"言葉になる前の感覚を、大切に扱ってください。",bg:["#f8efff","#ffe2f2"]},
+  22:{name:"大きな土台",words:"構築・現実化・社会性",aroma:"シダーウッド／ベチバー／オレンジ",msg:"理想を形にするための設計図を描く時です。",bg:["#eaf6ed","#f2eee4"]},
+  33:{name:"包む癒し",words:"奉仕・慈愛・育む力",aroma:"ローズ／カモミール／フランキンセンス",msg:"誰かを癒す前に、まず自分の器を満たしましょう。",bg:["#fff0f2","#fff0c9"]}
+};
+
+function sumDigits(text){
+  return String(text).split("").reduce((s,ch)=>s+(Number.isInteger(Number(ch))?Number(ch):0),0);
+}
+function reduceNum(n){
+  n = Number(n)||0;
+  while(n > 9 && !MASTER.has(n)){ n = sumDigits(n); }
+  return n || null;
+}
+function cleanName(name){
+  return String(name).toUpperCase().split("").filter(ch => ch >= "A" && ch <= "Z").join("");
+}
+function calcName(name, mode){
+  const letters = cleanName(name).split("");
+  const selected = letters.filter(ch => {
+    const vowel = VOWELS.has(ch);
+    if(mode === "vowels") return vowel;
+    if(mode === "consonants") return !vowel;
+    return true;
+  });
+  const total = selected.reduce((s,ch)=>s+(PY[ch]||0),0);
+  return {total, number: reduceNum(total)};
+}
+function calcBirth(date){
+  if(!date) return null;
+  const [y,m,d] = date.split("-");
+  if(!y || !m || !d) return null;
+  const thisYear = new Date().getFullYear();
+  const lifeTotal = sumDigits(y+m+d);
+  const yearTotal = sumDigits(String(thisYear)+m+d);
+  return {
+    lifeTotal, life: reduceNum(lifeTotal),
+    birthdayTotal: Number(d), birthday: reduceNum(Number(d)),
+    personalYearTotal: yearTotal, personalYear: reduceNum(yearTotal)
+  };
+}
+function boxHtml(title,label,number,total){
+  const g = guide[number];
+  return `
+    <div class="resultTop">
+      <div><div class="resultTitle">${title}</div><div class="resultLabel">${label}</div></div>
+      ${total ? `<div class="total">合計 ${total}</div>` : ``}
+    </div>
+    <div class="numline"><div class="num">${number || "—"}</div><div class="name">${g ? g.name : "未入力"}</div></div>
+    <div class="words">${g ? g.words : "入力すると表示されます"}</div>
+    <div class="smallmsg">${g ? g.msg : ""}</div>
+    ${g ? `<div class="smallAroma"><b>香り：</b>${g.aroma}</div>` : ``}
+  `;
+}
+function update(){
+  const birth = calcBirth(document.getElementById("birth").value);
+  const name = document.getElementById("name").value;
+  const hasName = cleanName(name).length > 0;
+  const destiny = calcName(name,"all");
+  const soul = calcName(name,"vowels");
+  const personality = calcName(name,"consonants");
+
+  document.getElementById("miniLife").textContent = birth?.life || "—";
+  document.getElementById("miniDestiny").textContent = hasName ? destiny.number : "—";
+  document.getElementById("miniYear").textContent = birth?.personalYear || "—";
+
+  const mainNumber = birth?.life || (hasName ? destiny.number : null);
+  const main = guide[mainNumber];
+
+  document.getElementById("mainNum").textContent = mainNumber || "—";
+  document.getElementById("mainName").textContent = main ? main.name : "入力してください";
+  document.getElementById("mainWords").textContent = main ? main.words : "数字がすぐ出ます";
+  document.getElementById("mainMsg").textContent = main ? main.msg : "生年月日を入れると本質の数字が、名前を入れると使命・本音・印象の数字が表示されます。";
+  const aroma = document.getElementById("mainAroma");
+  if(main){
+    aroma.style.display = "block";
+    aroma.innerHTML = "<b>おすすめの香り：</b>" + main.aroma;
+    document.getElementById("mainCard").style.background = `linear-gradient(135deg, ${main.bg[0]}, ${main.bg[1]})`;
+  }else{
+    aroma.style.display = "none";
+    document.getElementById("mainCard").style.background = "linear-gradient(135deg,#fff8ed,#f7dfe2)";
+  }
+
+  document.getElementById("lifeBox").innerHTML = boxHtml("LIFE PATH","生まれ持った本質",birth?.life,birth?.lifeTotal);
+  document.getElementById("birthBox").innerHTML = boxHtml("BIRTHDAY","自然に出る才能",birth?.birthday,birth?.birthdayTotal);
+  document.getElementById("yearBox").innerHTML = boxHtml("PERSONAL YEAR","今年の流れ",birth?.personalYear,birth?.personalYearTotal);
+  document.getElementById("destinyBox").innerHTML = boxHtml("DESTINY","名前全体 使命",hasName ? destiny.number : null,hasName ? destiny.total : null);
+  document.getElementById("soulBox").innerHTML = boxHtml("SOUL","母音 本音",hasName ? soul.number : null,hasName ? soul.total : null);
+  document.getElementById("personalityBox").innerHTML = boxHtml("PERSONALITY","子音 印象",hasName ? personality.number : null,hasName ? personality.total : null);
+}
+function resetAll(){
+  document.getElementById("birth").value = "";
+  document.getElementById("name").value = "";
+  update();
+}
+document.getElementById("birth").addEventListener("input", update);
+document.getElementById("name").addEventListener("input", update);
+update();
+</script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function() {
+    navigator.serviceWorker.register("./sw.js").catch(function(){});
+  });
+}
+</script>
+</body>
+</html>
